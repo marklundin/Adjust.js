@@ -3,7 +3,7 @@ define(function(){
     return {
 
 
-        Slider : function( name ){
+        Slider : function( name, value ){
 
             var domElement = document.createElement( 'div' ),
                 input = document.createElement('input'),
@@ -30,7 +30,7 @@ define(function(){
 
                 set value ( v ){
                     input.value = v;
-                    label.innerHTML = v;
+                    label.innerText = v;
                 },
 
                 get value (){
@@ -38,10 +38,12 @@ define(function(){
                 }
             }
 
+            api.value = value;
+
             return api;
         },
 
-        Button : function( name ){
+        Button : function( name, value ){
 
             var domElement = document.createElement( 'div' ),
                 innerButton = document.createElement( 'input' ),
@@ -57,16 +59,16 @@ define(function(){
 
             api = {
                 domElement: domElement,
-                onchange: function(){}
+                onchange: function(){},
             }
 
             return api;
         },
 
-        TextInput : function( name ){
+        TextInput : function( name, value ){
 
             var domElement = document.createElement( 'div' ),
-                label = document.createElement( 'div' ),
+                label = document.createElement( 'label' ),
                 input = document.createElement( 'input' ),
                 api;
 
@@ -75,6 +77,7 @@ define(function(){
 
             label.innerText = name;
             input.type = 'text';
+
 
             input.onchange = function(){
                 api.onchange(input.value)
@@ -90,14 +93,24 @@ define(function(){
 
             api = {
                 domElement: domElement,
-                onchange: function(){}
+                onchange: function(){},
+
+                set value ( v ){
+                    input.value = v;
+                },
+
+                get value (){
+                    return input.value;
+                }
             }
+
+            api.value = value;
 
             return api;
         },
 
 
-        Color : function( name, window ){
+        Color : function( name, value, window ){
 
             var domElement = document.createElement( 'div' ),
                 picker = document.createElement( 'div' ),
@@ -110,32 +123,64 @@ define(function(){
 
             picker.id = "picker";
             picker.innerText = picker.id;
-
-
             input.type = 'text';
-            input.value = "#111111";
-
 
 
             window.$(document).ready(function() {
                 window.$.farbtastic( picker, function( color ){
-                    console.log( color, input.value )
                      input.value = color;
-                     api.onchange( parseInt( "#112233".split('#')[1], 16 ));
+                     api.onchange( parseInt( color.split('#')[1], 16 ));
                 } );
             });
 
             api = {
                 domElement: domElement,
-                onchange: function(){}
+                onchange: function(){},
+                set value ( v ){
+                    input.value = "#"+ v.toString( 16 );
+                },
+
+                get value (){
+                    return parseInt( input.value.split('#')[1], 16 )
+                }
             }
+
+            api.value = value
+
+            return api;
+        },
+
+
+        CheckBox : function( name, value ){
+
+            var domElement = document.createElement( 'div' ),
+                input = document.createElement( 'input' ),
+                label = document.createElement( 'label' ),
+                api;
+
+            domElement.appendChild( label );
+            domElement.appendChild( input );
+
+            input.type = 'checkbox';
+            label.innerText = name;
+
+
+            api = {
+                domElement: domElement,
+                onchange: function(){},
+                set value ( v ){
+                    input.checked = v;
+                },
+
+                get value (){
+                    return input.checked;
+                }
+            }
+
+            api.value = value;
 
             return api;
         }
 
-
-
     }
-
-
 });

@@ -21,7 +21,6 @@ var onConnect = function( p){
     port = PORTS()( p );
 
     port.listen( ["REQUEST_OBJECT_DEF", "UPDATED", "CHANGED"], function( evt ){
-        console.log('getting', evt );
         window.postMessage( {type:evt.type, message:evt.message }, "*" );
     })
 

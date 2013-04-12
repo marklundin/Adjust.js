@@ -2,20 +2,18 @@
 input[type="range"]{
     -webkit-appearance: none;
     -moz-apperance: none;
+
     width: 100%;
     height: 15px;
-    padding: 5px;
-
-
-    background: #024069;
     border-radius: 2px;
-    margin-top: 25px;
+    margin-top: 10px;
+
     background-image: -webkit-gradient(
         linear,
         left top,
         right top,
-        color-stop(0.2, #111111 ),
-        color-stop(0.2, #777777 )
+        color-stop( 0.2, #111111 ),
+        color-stop( 0.2, #777777 )
     );
 }
 
@@ -23,7 +21,7 @@ input[type="range"]{
 input[type="range"]::-webkit-slider-thumb{
     -webkit-appearance:none;
     cursor: ew-resize;
-    width:5px;
+    width:1px;
     height:15px;
     background: #111111
 

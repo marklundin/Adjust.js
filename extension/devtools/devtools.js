@@ -17,7 +17,7 @@ require([
         chrome.experimental.devtools.console.addMessage( chrome.experimental.devtools.console.Severity.Log, "AD.JS: " + message );
     }
 
-    chrome.devtools.panels.create( 'AJUI', '/assets/icon.png', '/devtools/page.html', function( extensionPanel ){
+    chrome.devtools.panels.create( 'Adjs', '/assets/icon_32.png', '/devtools/page.html', function( extensionPanel ){
 
 
         //Events
@@ -39,8 +39,8 @@ require([
 
         port.listen( 'UPDATED', function( evt ){
 
-            var elem = controllers[evt.message.from].querySelector( "#"+evt.message.change.name );
-            setElemValue( elem, evt.message.change.value);
+            var controlier = controllers[evt.message.from][evt.message.change.name ];
+            controlier.value = evt.message.change.value;
             log( 'UPDATED FROM: ' + evt.message.from + ". Change is, " + evt.message.change.name + " = " + evt.message.change.value );
 
         });
@@ -73,19 +73,19 @@ require([
                     typeof value === 'boolean';
         }
 
-        function getInputType( value ){
-            return ( value === '-*ad.js function*-' ) ? 'button' :
-                   ( typeof value === 'string' )    ? 'text' :
-                   ( typeof value === 'number' )    ? 'range' :
-                   ( typeof value === 'boolean' )   ? 'checkbox' : null;
+
+        function getController( name, value ){
+            return ( value === '-*ad.js function*-' ) ? new control.Button( name, value ) :
+                   ( getSignature( value ) === 'color' ) ? new control.Color( name, value )  :
+                   ( typeof value === 'string' )    ? new control.TextInput( name, value ) :
+                   ( typeof value === 'number' )    ? new control.Slider( name, value )  :
+                   ( typeof value === 'boolean' )   ? new control.CheckBox( name, value )  : null;
         }
 
-        function getElemValue( elem ){
-            return  elem.type === 'checkbox' ? elem.checked :
-                    elem.type === 'text' ? elem.value :
-                    elem.type === 'range' ? elem.value :
-                    elem.type === 'button' ? null : null
+        function getSignature( value ){
+            return false;
         }
+
 
         function setElemValue( elem, value ){
             if( elem.type === 'button' ) return;
@@ -96,12 +96,30 @@ require([
 
 
         function clean(){
+
+            //remove listeners
+            if( controllers )
+            {
+                for( var inst in controllers )
+                {
+                    for( var contrs in controllers[inst] ){
+
+                        controllers[inst][contrs].onchange = null
+
+                    }
+                }
+            }
+
+            //clean dom
             if( container ){
                 while (container.firstChild) {
+                    console.log( 'test' );
                     container.removeChild(container.firstChild);
                 }
             }
-            controllers = [];
+
+            controllers = []
+
         }
 
 
@@ -122,79 +140,36 @@ require([
                 heading = doc.createElement( 'h3' );
 
                 subCont.id = name;
+                subCont.className = 'adjs-instance';
 
                 heading.innerHTML = name;
 
                 subCont.appendChild( heading );
                 container.appendChild( subCont );
 
-                controllers[controllers.length] = subCont;
+                var instControllers = controllers[controllers.length] = [];
 
 
-                var toots = new control.Slider( 'tits' );
-                toots.value = 22;
-                toots.onchange = function(obj){
-                    log( obj );
-                }
-
-                container.appendChild( toots.domElement );
-
-                var boots = new control.Button( 'Some Function' );
-                boots.onchange = function(obj){
-                    log( obj );
-                }
-                container.appendChild( boots.domElement );
-
-                log( jQuery );
-                var fruits = new control.TextInput( 'Some Text');
-                fruits.onchange = function(obj){
-                    log( obj );
-                }
-                container.appendChild( fruits.domElement );
-
-
-                var pootles = new control.Color( 'some color', wind  );
-                pootles.onchange = function(obj){
-                    log( obj );
-                }
-                container.appendChild( pootles.domElement );
 
                 def = model[i].definition;
                 for( var prop in def ){
 
-                    controllerElem = document.createElement("div");
-                    label = document.createElement("Label");
-
-                    label.for = prop;
-                    label.innerHTML = def[prop] === '-*ad.js function*-' ? "Call" : prop;
-
-                    controllerElem.class = 'controller';
-
                     if( isViewableProp( def[prop] )){
 
-                        domElem = doc.createElement( "input" );
-                        domElem.id = prop
-                        domElem[def[prop] === '-*ad.js function*-' ? 'value' : 'innerHTML'] = prop;
-                        domElem.type = getInputType( def[prop] );
-                        setElemValue( domElem, def[prop] );
+                        var controllier = getController( prop, def[prop] );
+                        controllier.domElement.id = prop;
+                        controllier.domElement.className = 'controller';
 
-                        domElem[ domElem.type === 'button' ? 'onclick' : 'onchange' ] = function( elem, index, propName ){
+                        controllier.onchange = function( elem, index, propName ){
 
-                            port.sendMessage( 'CHANGED', {from:index, prop:propName, value:getElemValue( elem ) })
+                            port.sendMessage( 'CHANGED', {from:index, prop:propName, value:controllier.value })
 
-                        }.bind( this, domElem, i, prop );
-
-                    }else{
-
-                        domElem = doc.createElement( "div" );
-                        domElem.id = prop;
-                        domElem.innerHTML = "Type " + typeof def[prop] + " are not yet supported";
+                        }.bind( this, controllier, i, prop );
 
                     }
 
-                    controllerElem.appendChild( label );
-                    controllerElem.appendChild( domElem );
-                    subCont.appendChild( controllerElem );
+                    instControllers.push( controllier );
+                    subCont.appendChild( controllier.domElement );
 
                 }
             }
@@ -203,10 +178,6 @@ require([
 
         }
 
-
-
-        //DO we need to use these status bare buttons
-        //extensionPanel.createStatusBarButton( '/assets/icon.png', 'Test', false );
 
         extensionPanel.onShown.addListener( function( window ){
 

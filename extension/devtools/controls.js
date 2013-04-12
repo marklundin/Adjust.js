@@ -54,7 +54,8 @@ define(function(){
             innerButton.type = 'button';
             innerButton.value = name;
             innerButton.onclick = function(){
-                api.onchange( innerButton.value );
+                console.log( 'click' );
+                api.onchange();
             };
 
             api = {

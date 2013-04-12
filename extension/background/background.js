@@ -86,7 +86,7 @@ require([ 'underscore' ], function( ){
 
 
                         devport.messageHandler = function( evt ) {
-                            // console.log( evt.type )
+                            console.log( evt )
                             if( contentport ) contentport.postMessage({ type: evt.type , message:evt.message });
                         };
 

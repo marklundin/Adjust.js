@@ -41,7 +41,7 @@ require([
 
             var controlier = controllers[evt.message.from][evt.message.change.name ];
             controlier.value = evt.message.change.value;
-            log( 'UPDATED FROM: ' + evt.message.from + ". Change is, " + evt.message.change.name + " = " + evt.message.change.value );
+            // log( 'UPDATED FROM: ' + evt.message.from + ". Change is, " + evt.message.change.name + " = " + evt.message.change.value );
 
         });
 
@@ -147,8 +147,7 @@ require([
                 subCont.appendChild( heading );
                 container.appendChild( subCont );
 
-                var instControllers = controllers[controllers.length] = [];
-
+                var instControllers = [];
 
 
                 def = model[i].definition;
@@ -160,18 +159,22 @@ require([
                         controllier.domElement.id = prop;
                         controllier.domElement.className = 'controller';
 
-                        controllier.onchange = function( elem, index, propName ){
+                        controllier.onchange = function( c, index, propName ){
+                            port.sendMessage( 'CHANGED', {from:index, prop:propName, value:c.value })
 
-                            port.sendMessage( 'CHANGED', {from:index, prop:propName, value:controllier.value })
-
-                        }.bind( this, controllier, i, prop );
+                        }.bind( this, controllier, controllers.length, prop );
 
                     }
 
-                    instControllers.push( controllier );
+
+                    instControllers[prop] = controllier;
+
                     subCont.appendChild( controllier.domElement );
 
                 }
+
+                controllers[controllers.length] = instControllers;
+
             }
 
             viewReady = true;

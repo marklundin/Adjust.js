@@ -57,10 +57,16 @@
     		});
         }
 
-		apiClassInstance.number = 2.5;
-		apiClassInstance.number = 3.5;
-		apiClassInstance.number = 3.5;
-		apiClassInstance.number = 4.5;
+        var i = 0;
+        function loop(){
+
+            i += 0.001;
+            apiClassInstance.number = Math.sin( i ) * 20 + 10;
+            requestAnimationFrame( loop );
+
+        }
+
+        // loop();
 
 
 	</script>

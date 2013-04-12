@@ -1,14 +1,16 @@
-lib-cov
-*.seed
-*.log
-*.csv
-*.dat
-*.out
-*.pid
-*.gz
+# General OSX files
 
-pids
-logs
-results
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
 
-npm-debug.log
+# Thumbnails
+._*
+
+# Files that might appear on external disk
+.Spotlight-V100
+.Trashes
+
+# SublimeText project files
+*.sublime-workspace

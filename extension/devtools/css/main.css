@@ -1,0 +1,21 @@
+@import url("range.css");
+
+html, body{
+    height:100%;
+    background: #eeeeee;
+    font-family: "courier";
+    font-size: 0.8em;
+}
+
+.main{
+    height:100%;
+    -webkit-column-width: 25em;
+}
+
+.controller{
+    display: block;
+}
+
+.column{
+    width: 30%;
+}

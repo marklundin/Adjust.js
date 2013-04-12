@@ -1,0 +1,68 @@
+<html>
+<head>
+	<script src='../js/ajui.js'></script>
+</head>
+<body>
+	<h1>AJUI demo</h1>
+	<script>
+
+		// Classes
+		var Vec3 = function( a, b, c )
+		{
+			this.x = a||0.0;
+			this.y = b||0.0;
+			this.z = c||0.0;
+		}
+
+
+		// Application
+
+		var vec = new Vec3( 1, 2 );
+
+
+		// API
+
+
+		var ApiClass = function()
+		{
+			this.number = 1.5;
+			this.integer = 2.0;
+            this.color = 0xff00ff;
+			this.string = 'api class string';
+			this.apivec = vec;
+		}
+
+		var apiClassInstance = new ApiClass();
+
+
+		//AJUI
+
+		var apiJUI = new A.JUI( 'Special Adjustment', apiClassInstance );
+
+        var ajui;
+        document.onclick = function(){
+
+    		ajui = new A.JUI( {
+    			bool: true,
+    			float: 1.0,
+    			int: 0,
+    			fn: function(){console.log( 'CALLED' )},
+    			str: 'A string',
+    			arr: [0, 2, 3, 4, 5, 6],
+    			obj:{
+    				bool2: false,
+    				float: 2.2
+    			}
+
+    		});
+        }
+
+		apiClassInstance.number = 2.5;
+		apiClassInstance.number = 3.5;
+		apiClassInstance.number = 3.5;
+		apiClassInstance.number = 4.5;
+
+
+	</script>
+</body>
+</html>

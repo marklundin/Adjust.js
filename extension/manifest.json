@@ -1,0 +1,38 @@
+{
+
+    "name": "Ad.js",
+    "description": "A Javascript User Interface",
+    "manifest_version": 2,
+    "version": "0.0.2",
+    "devtools_page": "devtools/devtools.html",
+    "minimum_chrome_version": "1.0",
+
+    "browser_action": {
+        "default_icon": "/assets/icon128.png"  // optional
+    },
+
+    "background": {
+        "page": "background/background_page.html",
+        // "scripts": ["/medium.js"],
+        "persistent": true
+    },
+
+    "permissions": [
+        "tabs",
+        "experimental",
+        "browsingData",
+        "http://*/*",
+        "https://*/*",
+        "file://*"
+    ]//,
+
+    // "content_scripts":[
+    //     {
+    //         "js":[ "/injected/contentscript.js" ],
+    //         "matches": [ "http://*/*", "https://*/*", "file://*"  ],
+    //         "run_at":"document_start",
+    //         "all_frames": true
+    //     }
+    // ]
+
+}

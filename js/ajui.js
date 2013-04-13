@@ -41,7 +41,6 @@ A = {
             var change = e.data.message;
 
             // handle functions
-            console.log( change.from, change.prop);
             if( typeof A.all[change.from].api[change.prop] === 'function' ){
                 A.all[change.from].api[change.prop].call( null );
             }

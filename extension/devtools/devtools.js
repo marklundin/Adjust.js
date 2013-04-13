@@ -73,10 +73,17 @@ require([
                     typeof value === 'boolean';
         }
 
-
+        var colorSignatures = [
+            {
+                r:0,
+                g:0,
+                b:0
+            }
+        ]
         function getController( name, value ){
+            console.log( definesSignature( value, colorSignatures ), value, colorSignatures );
             return ( value === '-*ad.js function*-' ) ? new control.Button( name, value ) :
-                   ( getSignature( value ) === 'color' ) ? new control.Color( name, value )  :
+                   ( definesSignature( value, colorSignatures ) ) ? new control.Color( name, value, wind )  :
                    ( typeof value === 'string' )    ? new control.TextInput( name, value ) :
                    ( typeof value === 'number' )    ? new control.Slider( name, value )  :
                    ( typeof value === 'boolean' )   ? new control.CheckBox( name, value )  : null;
@@ -122,7 +129,23 @@ require([
 
         }
 
+        function definesSignature( obj, signatures ){
 
+            var i = signatures.length,
+                signature;
+
+            while( i-- > 0 ){
+                signature = signatures[i];
+                for( var prop in signature ){
+                    if( signature.hasOwnProperty( prop ) && obj.hasOwnProperty( prop ) ){
+                        if( typeof obj[prop] !== typeof signature[prop]) return false;
+                    }else{
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
 
         function createView( model ){
 
@@ -153,9 +176,10 @@ require([
                 def = model[i].definition;
                 for( var prop in def ){
 
-                    if( isViewableProp( def[prop] )){
+                    // if( isViewableProp( def[prop] )){
 
-                        var controllier = getController( prop, def[prop] );
+                    var controllier = getController( prop, def[prop] );
+                    if( controllier ){
                         controllier.domElement.id = prop;
                         controllier.domElement.className = 'controller';
 

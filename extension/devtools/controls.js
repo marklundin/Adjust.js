@@ -116,6 +116,7 @@ define(function(){
             var domElement = document.createElement( 'div' ),
                 picker = document.createElement( 'div' ),
                 input = document.createElement( 'div' ),
+                pValue = {r:0,g:0, b:0},
                 api;
 
 
@@ -126,23 +127,31 @@ define(function(){
             picker.innerText = picker.id;
             input.type = 'text';
 
-
-            window.$(document).ready(function() {
-                window.$.farbtastic( picker, function( color ){
+            var cpicker;
+            // window.$(document).ready(function() {
+                cpicker = window.$.farbtastic( picker, function( color ){
                      input.value = color;
                      api.onchange( parseInt( color.split('#')[1], 16 ));
                 } );
-            });
+            // });
 
             api = {
                 domElement: domElement,
                 onchange: function(){},
                 set value ( v ){
-                    input.value = "#"+ v.toString( 16 );
+                    pValue = v;
+
+                    input.value = "#"+ Number( v.r << 16 | v.g << 8 | v.b ).toString( 16 );
+                    cpicker.setColor( input.value );
+
                 },
 
                 get value (){
-                    return parseInt( input.value.split('#')[1], 16 )
+                    var hex = parseInt( input.value.split('#')[1], 16 );
+                    pValue.r = hex >> 16;
+                    pValue.g = hex >> 8 & 0xFF;
+                    pValue.b = hex & 0xFF;
+                    return pValue;
                 }
             }
 

@@ -1,11 +1,11 @@
 {
 
-    "name": "Ad.js",
-    "description": "A Javascript User Interface",
+    "name": "Adjust",
+    "description": "A extensible dev tool for interfacing and adjusting javascript objects.",
     "manifest_version": 2,
-    "version": "0.0.2",
+    "version": "0.0.1",
     "devtools_page": "devtools/devtools.html",
-    "minimum_chrome_version": "1.0",
+    "minimum_chrome_version": "26.0",
 
     "browser_action": {
         "default_icon": "/assets/icon128.png"  // optional
@@ -13,7 +13,6 @@
 
     "background": {
         "page": "background/background_page.html",
-        // "scripts": ["/medium.js"],
         "persistent": true
     },
 
@@ -24,15 +23,6 @@
         "http://*/*",
         "https://*/*",
         "file://*"
-    ]//,
-
-    // "content_scripts":[
-    //     {
-    //         "js":[ "/injected/contentscript.js" ],
-    //         "matches": [ "http://*/*", "https://*/*", "file://*"  ],
-    //         "run_at":"document_start",
-    //         "all_frames": true
-    //     }
-    // ]
+    ]
 
 }

@@ -5,11 +5,6 @@ A = {
 (function( global ){
 
 
-    if( !Object.observe ){
-        console.error( "ADJS cannot run without certain javascript features. You do not seem to have these enabled. These can be enabled by right-clicking this link, chrome://flags/ then click enable on the <b>Enable Experimental JavaScript</b> setting. You will then to restart you browser")
-        return;
-    }
-
     var Event = function( type, message ){
       this.type     = type || 'GENERIC';
       this.from     = 'JUI';
@@ -48,7 +43,6 @@ A = {
 
             Object.unobserve( A.all[change.from].api, A.all[change.from].changeHandler );
             A.all[change.from].api[change.prop] = change.value;
-            // console.log(  A.all[change.from].api[change.prop] )
             Object.observe( A.all[change.from].api, A.all[change.from].changeHandler );
         }
     });
@@ -99,7 +93,6 @@ A = {
 			changed = ( change.oldValue !== change.object[ change.name ] );
 
 	    	if ( changed ) {
-
                 var evt = new Event(
                     change.type,
                     {

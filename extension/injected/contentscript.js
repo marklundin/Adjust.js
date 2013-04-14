@@ -16,11 +16,9 @@ var onConnect = function( p){
 
     if( p.name !== 'content' ) return;
 
-    console.log('HERE');
-
     port = PORTS()( p );
 
-    port.listen( ["REQUEST_OBJECT_DEF", "UPDATED", "CHANGED"], function( evt ){
+    port.listen( ["REQUEST_OBJECT_DEF", "UPDATED", "CHANGED" ], function( evt ){
         window.postMessage( {type:evt.type, message:evt.message }, "*" );
     })
 

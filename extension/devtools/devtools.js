@@ -9,8 +9,8 @@ require([
     var control_model,
         container, doc,
         viewReady = false,
-        controllers = [],
-        jQuery, wind;
+        controllers = [], port,
+        jQuery, wind, browserConfigured;
 
 
     function log( message ){
@@ -18,50 +18,6 @@ require([
     }
 
     chrome.devtools.panels.create( 'Adjs', '/assets/icon_32.png', '/devtools/page.html', function( extensionPanel ){
-
-
-        //Events
-        //
-        var port = connect( 'dev_tool_'+chrome.devtools.inspectedWindow.tabId  );
-
-        port.listen( ["CONNECTED", "PAGE_CHANGED"], function( evt ){
-
-            log( evt.type );
-            control_model = null;
-            port.sendMessage( 'REQUEST_OBJECT_DEF' );
-
-        });
-
-        port.listen( "DISCONNECTED", function(){
-            log( 'CLEANING' );
-            clean();
-        });
-
-        port.listen( 'UPDATED', function( evt ){
-
-            var controlier = controllers[evt.message.from][evt.message.change.name ];
-            controlier.value = evt.message.change.value;
-            // log( 'UPDATED FROM: ' + evt.message.from + ". Change is, " + evt.message.change.name + " = " + evt.message.change.value );
-
-        });
-
-        port.listen( 'OBJ_DEF', function( evt ){
-
-            log( 'OBJ_DEF' );
-            control_model = evt.message;
-            if( container ) createView( control_model );
-
-        });
-
-        port.listen( 'INIT', function( evt ){
-
-            log( 'INIT')
-            var model = evt.message;
-            if( container ) createView( [model] );
-            control_model[control_model.length] = evt.message;
-
-        });
-
 
         //fns
 
@@ -153,6 +109,7 @@ require([
                 heading, name, label,
                 controllerElem;
 
+            console.log( model.length );
 
             for( var i = 0 ; i < model.length ; i++ ){
 
@@ -188,13 +145,10 @@ require([
 
                         }.bind( this, controllier, controllers.length, prop );
 
+                        instControllers[prop] = controllier;
+                        subCont.appendChild( controllier.domElement );
+
                     }
-
-
-                    instControllers[prop] = controllier;
-
-                    subCont.appendChild( controllier.domElement );
-
                 }
 
                 controllers[controllers.length] = instControllers;
@@ -205,51 +159,92 @@ require([
 
         }
 
-
         extensionPanel.onShown.addListener( function( window ){
 
-            // if( document.readyState === 'complete'){
+            wind = window
+            doc = window.document;
 
-                wind = window
+            if( !browserConfigured ){
+                window.$( '#warning' ).html( "<img src='/assets/icon_32.png'></img><h1 style='display:inline; padding:15px;'>Oops...</h1><h2>You're browser is not configured correctly</h2><span>Adjust uses certain new javascript features that appear to be disable in this version of Chrome. To enable them, open the url <b><u>chrome://flags</u></b> and enable the <b>Enable Experimental JavaScript</b> setting, then restart your browser.</span>" );
+                return;
+            }else{
+                window.$( '#warning' ).hide();
+            }
 
-                doc = window.document;
-                container = doc.querySelector( '#container' );
-                if( control_model && !viewReady ) createView( control_model );
-            // }
-
-            // window.onload = function(){
-
-            // }
-
+            container = doc.querySelector( '#container' );
+            if( control_model && !viewReady ) createView( control_model );
 
         });
 
-        // extensionPanel.onHidden.addListener( function(  ){
-        //     container = null;
-        // });
+
+        chrome.devtools.inspectedWindow.eval(
+            "Object.observe",
+            function(result, isException) {
+
+                browserConfigured = result !== undefined;
+                if( !browserConfigured  ) return;
 
 
-        // extensionPanel.onShown.addListener(function( w ) {
+                //Events
+                //
+                port = connect( 'dev_tool_'+chrome.devtools.inspectedWindow.tabId  );
+
+                port.listen( ["CONNECTED", "PAGE_CHANGED"], function( evt ){
+
+                    log( evt.type );
+                    control_model = null;
+                    port.sendMessage( 'REQUEST_OBJECT_DEF' );
+
+                });
+
+                port.listen( "DISCONNECTED", function(){
+                    log( 'CLEANING' );
+                    clean();
+                });
+
+                port.listen( 'UPDATED', function( evt ){
+
+                    if( controllers && controllers[evt.message.from] ){
+                        var controlier = controllers[evt.message.from][evt.message.change.name ];
+                        if( controlier ) controlier.value = evt.message.change.value;
+                    }
+                    // log( 'UPDATED FROM: ' + evt.message.from + ". Change is, " + evt.message.change.name + " = " + evt.message.change.value );
+
+                });
+
+                port.listen( 'DELETED', function( evt ){
+                    log( "DELETED" );
+                    if( controllers && controllers[evt.message.from] ){
+                        var controlier = controllers[evt.message.from][evt.message.change.name ];
+                        controlier.onchange = null
+                        wind.$( controlier.domElement ).remove();
+
+                        //TODO :: Remove element from controller arr.
+
+                    }
+                });
+
+                port.listen( 'OBJ_DEF', function( evt ){
+
+                    log( 'OBJ_DEF' );
+                    control_model = evt.message;
+                    if( container ) createView( control_model );
+
+                });
+
+                port.listen( 'INIT', function( evt ){
+
+                    log( 'INIT')
+                    var model = evt.message;
+                    if( container ) createView( [model] );
+                    control_model[control_model.length] = evt.message;
+
+                });
 
 
 
-        // });
-
-        // UTILS
-
-
-        // function getSignature( obj )
-        // {
-        //     var ser = {};
-        //     for( var i in obj ){
-        //         log( i + " :: " +obj[i] );
-        //         ser[i] = obj[i] ===  "-*ad.js function*-" ? 'function' : typeof( obj[i] );
-
-        //     }
-        //     return ser;
-        // }
-
-
+            }
+        );
 
     });
 

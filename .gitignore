@@ -14,3 +14,8 @@ Icon
 
 # SublimeText project files
 *.sublime-workspace
+
+#Chrome extension files
+
+*.pem
+*.crx

@@ -14,7 +14,7 @@ require([
     var control_model,
         container, doc,
         viewReady = false,
-        controllers = [], port,
+        controllers = [], port, fileAccessFail = false,
         jQuery, wind, browserConfigured;
 
 
@@ -26,7 +26,7 @@ require([
     //     chrome.experimental.devtools.console.addMessage( chrome.experimental.devtools.console.Severity.Error, "AD.JS: " + message );
     // }
 
-    chrome.devtools.panels.create( 'Adjs', '/assets/icon_32.png', '/devtools/page.html', function( extensionPanel ){
+    chrome.devtools.panels.create( 'Adjust', '/assets/icon_32.png', '/devtools/page.html', function( extensionPanel ){
 
         //fns
 
@@ -171,6 +171,9 @@ require([
             if( !browserConfigured ){
                 window.$( '#warning' ).html( "<img src='/assets/icon_32.png'></img><h1 style='display:inline; padding:15px;'>Oops...</h1><h2>You're browser is not configured correctly</h2><span>Adjust uses certain new javascript features that appear to be disable in this version of Chrome. To enable them, open the url <b><u>chrome://flags</u></b> and enable the <b>Enable Experimental JavaScript</b> setting, then restart your browser.</span>" );
                 return;
+            }else if( fileAccessFail ){
+                window.$( '#warning' ).show();
+                wind.$('#warning').html("<img src='/assets/icon_32.png'></img><h1 style='display:inline; padding:15px;'>Oops...</h1><h2>You seem to be accessing a page using the <b>file://</b> schema.</h2><span> In order to to use this you need to grant Adjust permission to use local files. Open <b>chrome://extensions</b>, find the Adjust extension and check the <b>'Allow access to file URLs'</b> box.</span>");
             }else{
                 window.$( '#warning' ).hide();
             }
@@ -188,7 +191,6 @@ require([
                 browserConfigured = result !== undefined;
                 if( !browserConfigured  ) return;
 
-
                 // chrome.devtools.inspectedWindow.eval(
                 //     "A.version",
                 //     function(result, isException) {
@@ -205,8 +207,22 @@ require([
 
                         port.listen( ["CONNECTED", "PAGE_CHANGED"], function( evt ){
 
+                            console.log( evt.type );
                             control_model = null;
-                            port.sendMessage( 'REQUEST_OBJECT_DEF' );
+                            if( !evt.fileAccess ){
+                                chrome.devtools.inspectedWindow.eval( "document.URL",
+                                    function(result, isException) {
+                                        fileAccessFail = result.indexOf( 'file://') == 0 || isException;
+                                        if( fileAccessFail ){
+                                            if( wind ) wind.$('#warning').html("<img src='/assets/icon_32.png'></img><h1 style='display:inline; padding:15px;'>Oops...</h1><h2>You seem to be accessing a page using <b>file://</b></h2><span> In order to to this page you need to grant Adjust permission to use local files. Open <b>chrome://extensions</b>, find the Adjust extension and check the <b>'Allow access to file URLs'</b> box.</span>");
+                                        }else{
+                                            port.sendMessage( 'REQUEST_OBJECT_DEF' );
+                                        }
+                                    }
+                                );
+                            }else{
+                                port.sendMessage( 'REQUEST_OBJECT_DEF' );
+                            }
 
                         });
 
@@ -270,6 +286,7 @@ require([
 
                         port.listen( 'OBJ_DEF', function( evt ){
 
+                            console.log( 'OBJ_DEF' );
                             control_model = evt.message;
                             if( container ) createView( control_model );
 

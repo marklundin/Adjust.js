@@ -4,12 +4,13 @@
     "description": "A extensible dev tool for interfacing and adjusting javascript objects.",
     "manifest_version": 2,
     "version": "0.0.1",
+    "icons": {
+        "16": "assets/icon_32.png",
+        "48": "assets/icon_32.png",
+        "128": "assets/icon_32.png"
+    },
     "devtools_page": "devtools/devtools.html",
     "minimum_chrome_version": "26.0",
-
-    "browser_action": {
-        "default_icon": "/assets/icon128.png"  // optional
-    },
 
     "background": {
         "page": "background/background_page.html",

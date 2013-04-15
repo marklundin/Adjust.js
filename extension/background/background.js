@@ -26,7 +26,7 @@ require([ 'underscore' ], function( ){
 
             if( devport.name.indexOf( 'dev_tool_' ) === 0 ){
 
-                chrome.tabs.get( Number( devport.name.split( 'dev_tool_')[1] )|0, function( aTab) {
+                chrome.tabs.get( Number( devport.name.split( 'dev_tool_')[1] )|0, function( aTab ) {
 
                     var tab = aTab,
                         tabUrl = tab.url,
@@ -73,9 +73,11 @@ require([ 'underscore' ], function( ){
 
                                 injectScripts( tab.id, function(){
                                     contentport = chrome.tabs.connect( tab.id, {name:'content' });
-                                    connectContentPort();
-                                    devport.postMessage({type:"PAGE_CHANGED"});
 
+                                    chrome.extension.isAllowedFileSchemeAccess( function( allowed ){
+                                        connectContentPort();
+                                        devport.postMessage({type:"PAGE_CHANGED", fileAccess:allowed});
+                                    });
                                 });
 
                             }
@@ -99,9 +101,11 @@ require([ 'underscore' ], function( ){
 
                         });
 
-                        connectContentPort();
 
-                        devport.postMessage({type:"CONNECTED"});
+                        chrome.extension.isAllowedFileSchemeAccess( function( allowed ){
+                            connectContentPort();
+                            devport.postMessage({type:"CONNECTED", fileAccess:allowed});
+                        });
 
                     });
                 });

@@ -4,7 +4,6 @@ function updateSliderBackground( item ) {
     min = item.min === '' ? 0 : item.min;
     max = item.max === '' ? 100 : item.max;
     var realW = 2 / Number( item.offsetWidth );
-    console.log( item.offsetWidth );
     value = ((item.value - min)/(max - min )) + realW;
 
     item.style.backgroundImage = [

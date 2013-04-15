@@ -1,12 +1,10 @@
 require.config({
     paths:{
-        "adjust" : "../js/adjust"
+        adjust : "../js/adjust"
     }
 })
 
 require(['adjust'],function( adjust ){
-
-        console.log( adjust );
 
         var YourClass = function()
         {
@@ -20,6 +18,7 @@ require(['adjust'],function( adjust ){
 
 
         //Adjust
+
         var apiJUI = new adjust( 'YourClass Adjustment', apiClassInstance ),
             ajui = new adjust( {
                 bool: true,
@@ -28,6 +27,7 @@ require(['adjust'],function( adjust ){
                 fn: function(){console.log( 'CALLED' )},
                 str: 'A string',
             });
+
 
         var i = 0;
         function loop(){

@@ -1,11 +1,18 @@
 @import url("range.css");
 @import url("checkbox.css");
 
+*{
+    box-sizing: border-box;
+}
+
 html, body{
-    height:100%;
-    background: #eeeeee;
+
+    background: rgb(228, 226, 226);
     font-family: "courier new";
     font-size: 0.85em;
+    text-transform: uppercase;
+    margin: 0em;
+    padding: 0px;
 }
 
 #warning{
@@ -13,17 +20,21 @@ html, body{
     padding-top: 10%;
 }
 
+.floatRight{
+    float:right;
+}
+
 .main{
-    height:100%;
-    -webkit-column-width: 25em;
-    -moz-column-gap: 2em;
-    -moz-column-rule: 1px dashed #555555;
+    padding: 1em;
+    -webkit-column-width: 21em;
+    -moz-column-gap: 1em;
+    -webkit-column-gap: 1em;
 }
 
 .controller{
     border-top: 1px dotted rgb(102, 95, 95);
-    padding-top: 10px;
-    padding-bottom: 10px;
+    padding-top: 1em;
+    padding-bottom: 1em;
     display: block;
 }
 
@@ -32,9 +43,12 @@ html, body{
 }
 
 .adjs-instance{
-    border-bottom: 1px dotted rgb(102, 95, 95);
+
+    background: #eeeeee;
+    /*border-bottom: 1px dotted rgb(102, 95, 95);*/
     display: inline-block;
-    padding-bottom: 2em;
+    padding: 1em;
+    padding-top: 0.5em;
     width: 100%;
 }
 

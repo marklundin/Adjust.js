@@ -11,8 +11,9 @@ define(function(){
                 title = document.createElement('span'),
                 api;
 
-            // title.style = '{padding-right: 10px}';
+            label.className = 'floatRight';
             input.type = 'range';
+            input.step = 0.1;
             title.innerText = name;
 
             domElement.appendChild( title );
@@ -78,6 +79,7 @@ define(function(){
                 api;
 
             label.style = 'padding-right: 10px';
+            input.className = 'floatRight';
             domElement.appendChild( label );
             domElement.appendChild( input );
 

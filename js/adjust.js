@@ -43,8 +43,6 @@
 
     var Adjust = function( apiObjOrString, apiObj ){
 
-        debugger;
-        console.log( 'stuff' );
         var nameDefined = typeof apiObjOrString === 'string';
         this.name = nameDefined ? apiObjOrString : "ADJS " + ( all.length + 1 );
         this.api = nameDefined ? apiObj : apiObjOrString;

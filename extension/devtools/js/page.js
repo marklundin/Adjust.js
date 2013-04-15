@@ -3,7 +3,10 @@ function updateSliderBackground( item ) {
     var min, max;
     min = item.min === '' ? 0 : item.min;
     max = item.max === '' ? 100 : item.max;
-    value = (item.value - min)/(max - min)
+    var realW = 2 / Number( item.offsetWidth );
+    console.log( item.offsetWidth );
+    value = ((item.value - min)/(max - min )) + realW;
+
     item.style.backgroundImage = [
         '-webkit-gradient(',
         'linear, ',

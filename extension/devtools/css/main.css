@@ -21,6 +21,9 @@ html, body{
 }
 
 .controller{
+    border-top: 1px dotted rgb(102, 95, 95);
+    padding-top: 10px;
+    padding-bottom: 10px;
     display: block;
 }
 

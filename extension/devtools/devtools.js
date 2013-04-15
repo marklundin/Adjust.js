@@ -1,10 +1,15 @@
+
+
+
 require([
     'port',
-    'controls'
+    'controls',
     ],function(
         connect,
         control
     ){
+
+    var VERSION = "0.0.01";
 
     var control_model,
         container, doc,
@@ -16,6 +21,10 @@ require([
     function log( message ){
         chrome.experimental.devtools.console.addMessage( chrome.experimental.devtools.console.Severity.Log, "AD.JS: " + message );
     }
+
+    // function error( message ){
+    //     chrome.experimental.devtools.console.addMessage( chrome.experimental.devtools.console.Severity.Error, "AD.JS: " + message );
+    // }
 
     chrome.devtools.panels.create( 'Adjs', '/assets/icon_32.png', '/devtools/page.html', function( extensionPanel ){
 
@@ -37,7 +46,6 @@ require([
             }
         ]
         function getController( name, value ){
-            console.log( definesSignature( value, colorSignatures ), value, colorSignatures );
             return ( value === '-*ad.js function*-' ) ? new control.Button( name, value ) :
                    ( definesSignature( value, colorSignatures ) ) ? new control.Color( name, value, wind )  :
                    ( typeof value === 'string' )    ? new control.TextInput( name, value ) :
@@ -76,7 +84,6 @@ require([
             //clean dom
             if( container ){
                 while (container.firstChild) {
-                    console.log( 'test' );
                     container.removeChild(container.firstChild);
                 }
             }
@@ -109,12 +116,11 @@ require([
                 heading, name, label,
                 controllerElem;
 
-            console.log( model.length );
 
             for( var i = 0 ; i < model.length ; i++ ){
 
                 name = model[i].name;
-                log( name );
+                //log( name );
 
                 subCont = doc.createElement( 'div' );
                 heading = doc.createElement( 'h3' );
@@ -129,23 +135,21 @@ require([
 
                 var instControllers = [];
 
-
                 def = model[i].definition;
                 for( var prop in def ){
-
-                    // if( isViewableProp( def[prop] )){
 
                     var controllier = getController( prop, def[prop] );
                     if( controllier ){
                         controllier.domElement.id = prop;
                         controllier.domElement.className = 'controller';
-
-                        controllier.onchange = function( c, index, propName ){
-                            port.sendMessage( 'CHANGED', {from:index, prop:propName, value:c.value })
-
-                        }.bind( this, controllier, controllers.length, prop );
-
                         instControllers[prop] = controllier;
+
+                        controllier.onchange = function( c, pgroup, propName ){
+                            port.sendMessage( 'CHANGED', {from:controllers.indexOf( pgroup ), prop:propName, value:c.value })
+
+                        }.bind( this, controllier, instControllers, prop );
+
+
                         subCont.appendChild( controllier.domElement );
 
                     }
@@ -185,67 +189,115 @@ require([
                 if( !browserConfigured  ) return;
 
 
-                //Events
-                //
-                port = connect( 'dev_tool_'+chrome.devtools.inspectedWindow.tabId  );
+                // chrome.devtools.inspectedWindow.eval(
+                //     "A.version",
+                //     function(result, isException) {
 
-                port.listen( ["CONNECTED", "PAGE_CHANGED"], function( evt ){
+                //         // log( result );
+                //         if( result < VERSION || isException )
+                //         {
+                //             log( "Incompatible version of Adjust.js being used. Please update "+ result );
+                //             //return;
+                //         }
 
-                    log( evt.type );
-                    control_model = null;
-                    port.sendMessage( 'REQUEST_OBJECT_DEF' );
+                        //
+                        port = connect( 'dev_tool_'+chrome.devtools.inspectedWindow.tabId  );
 
-                });
+                        port.listen( ["CONNECTED", "PAGE_CHANGED"], function( evt ){
 
-                port.listen( "DISCONNECTED", function(){
-                    log( 'CLEANING' );
-                    clean();
-                });
+                            control_model = null;
+                            port.sendMessage( 'REQUEST_OBJECT_DEF' );
 
-                port.listen( 'UPDATED', function( evt ){
+                        });
 
-                    if( controllers && controllers[evt.message.from] ){
-                        var controlier = controllers[evt.message.from][evt.message.change.name ];
-                        if( controlier ) controlier.value = evt.message.change.value;
-                    }
-                    // log( 'UPDATED FROM: ' + evt.message.from + ". Change is, " + evt.message.change.name + " = " + evt.message.change.value );
+                        port.listen( "DISCONNECTED", function(){
+                            clean();
+                        });
 
-                });
+                        port.listen( 'UPDATED', function( evt ){
 
-                port.listen( 'DELETED', function( evt ){
-                    log( "DELETED" );
-                    if( controllers && controllers[evt.message.from] ){
-                        var controlier = controllers[evt.message.from][evt.message.change.name ];
-                        controlier.onchange = null
-                        wind.$( controlier.domElement ).remove();
+                            if( controllers && controllers[evt.message.from] ){
+                                var controlier = controllers[evt.message.from][evt.message.change.name ];
+                                if( controlier ) controlier.value = evt.message.change.value;
+                            }
+                            // log( 'UPDATED FROM: ' + evt.message.from + ". Change is, " + evt.message.change.name + " = " + evt.message.change.value );
 
-                        //TODO :: Remove element from controller arr.
+                        });
 
-                    }
-                });
+                        port.listen( 'DELETED', function( evt ){
 
-                port.listen( 'OBJ_DEF', function( evt ){
+                            if( controllers && controllers[evt.message.from] ){
+                                var controlier = controllers[evt.message.from][evt.message.change.name ];
+                                controlier.onchange = null;
+                                if( wind )wind.$( controlier.domElement ).remove();
+                            }
 
-                    log( 'OBJ_DEF' );
-                    control_model = evt.message;
-                    if( container ) createView( control_model );
+                            delete control_model[evt.message.from].definition[evt.message.change.name ];
+                        });
 
-                });
+                        port.listen( 'NEW', function( evt ){
 
-                port.listen( 'INIT', function( evt ){
+                            var obj = evt.message;
 
-                    log( 'INIT')
-                    var model = evt.message;
-                    if( container ) createView( [model] );
-                    control_model[control_model.length] = evt.message;
+                            control_model[obj.from].definition[obj.change.name] = obj.change.value;
 
-                });
+                            if( wind ){
+
+                                var controllier = getController( obj.change.name, obj.change.value );
+
+                                if( controllier ){
+                                    controllier.domElement.id = obj.change.name;
+                                    controllier.domElement.className = 'controller';
+                                    var group = controllers[obj.from];
+                                    group[obj.change.name] = controllier;
+
+                                    controllier.onchange = function( c, pgroup, propName ){
+
+                                        port.sendMessage( 'CHANGED', {from:controllers.indexOf( pgroup ), prop:propName, value:c.value })
+
+                                    }.bind( this, controllier, group, obj.change.name );
+
+                                    //subCont.appendChild( controllier.domElement );
+
+                                    // TODO :: what if panel isnt show yet
+                                    container.childNodes[obj.from].appendChild( controllier.domElement );
+
+                                }
+                            }else{
+
+                            }
+                        });
+
+                        port.listen( 'OBJ_DEF', function( evt ){
+
+                            control_model = evt.message;
+                            if( container ) createView( control_model );
+
+                        });
+
+                        port.listen( 'INIT', function( evt ){
+
+                            var model = evt.message;
+                            if( container ) createView( [model] );
+                            control_model[control_model.length] = evt.message;
+
+                        });
+
+                        port.listen( 'REMOVE', function( evt ){
+
+                            for( var i in controllers[evt.message.from] ){
+                                controllers[evt.message.from][i].onchange = null
+                            }
+
+                            if( container ) container.removeChild( container.childNodes[ evt.message.from ] );
+                            control_model.splice( evt.message.from, 1 );
+                            controllers.splice( evt.message.from, 1 );
 
 
-
+                        });
+                    // }
+                // );
             }
         );
-
     });
-
 });

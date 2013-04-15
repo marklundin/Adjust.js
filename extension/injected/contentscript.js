@@ -6,7 +6,7 @@ var port;
 
 function onMessage( e ) {
 
-    if ( event.source != window || event.data.from !== 'JUI' ) return;
+    if ( event.source != window || event.data.from !== 'Adjust' ) return;
     if( port ) port.sendMessage( event.data.type, event.data.message );
 
 }

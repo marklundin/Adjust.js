@@ -4,6 +4,7 @@
 require([
     'port',
     'controls',
+    'js/build/three.min'
     ],function(
         connect,
         control
@@ -45,12 +46,12 @@ require([
                 b:0
             }
         ]
-        function getController( name, value ){
-            return ( value === '-*ad.js function*-' ) ? new control.Button( name, value ) :
-                   ( definesSignature( value, colorSignatures ) ) ? new control.Color( name, value, wind )  :
-                   ( typeof value === 'string' )    ? new control.TextInput( name, value ) :
-                   ( typeof value === 'number' )    ? new control.Slider( name, value )  :
-                   ( typeof value === 'boolean' )   ? new control.CheckBox( name, value )  : null;
+        function getController( name, value, constraints ){
+            return ( value === '-*ad.js function*-' ) ? new control.Button( name, value , constraints) :
+                   ( definesSignature( value, colorSignatures ) ) ? new control.Color( name, value, constraints, wind )  :
+                   ( typeof value === 'string' )    ? new control.TextInput( name, value, constraints ) :
+                   ( typeof value === 'number' )    ? new control.Slider( name, value, constraints )  :
+                   ( typeof value === 'boolean' )   ? new control.CheckBox( name, value, constraints )  : null;
         }
 
         function getSignature( value ){
@@ -133,12 +134,16 @@ require([
                 subCont.appendChild( heading );
                 container.appendChild( subCont );
 
+                // TODO : Remove
+                var vec = new control.Vector3( 'Vec3', {x:23, y:23, z:23 }, {}, wind );
+                subCont.appendChild( vec.domElement );
+
                 var instControllers = [];
 
                 def = model[i].definition;
                 for( var prop in def ){
 
-                    var controllier = getController( prop, def[prop] );
+                    var controllier = getController( prop, def[prop], model[i].constraints[prop] );
                     if( controllier ){
                         controllier.domElement.id = prop;
                         controllier.domElement.className = 'controller';
@@ -163,19 +168,19 @@ require([
 
         }
 
-        extensionPanel.onShown.addListener( function( window ){
+        extensionPanel.onShown.addListener( function( w ){
 
-            wind = window
-            doc = window.document;
+            wind = w
+            doc = w.document;
 
             if( !browserConfigured ){
-                window.$( '#warning' ).html( "<img src='/assets/icon_32.png'></img><h1 style='display:inline; padding:15px;'>Oops...</h1><h2>You're browser is not configured correctly</h2><span>Adjust uses certain new javascript features that appear to be disable in this version of Chrome. To enable them, open the url <b><u>chrome://flags</u></b> and enable the <b>Enable Experimental JavaScript</b> setting, then restart your browser.</span>" );
+                w.$( '#warning' ).html( "<img src='/assets/icon_32.png'></img><h1 style='display:inline; padding:15px;'>Oops...</h1><h2>You're browser is not configured correctly</h2><span>Adjust uses certain new javascript features that appear to be disable in this version of Chrome. To enable them, open the url <b><u>chrome://flags</u></b> and enable the <b>Enable Experimental JavaScript</b> setting, then restart your browser.</span>" );
                 return;
             }else if( fileAccessFail ){
-                window.$( '#warning' ).show();
+                w.$( '#warning' ).show();
                 wind.$('#warning').html("<img src='/assets/icon_32.png'></img><h1 style='display:inline; padding:15px;'>Oops...</h1><h2>You seem to be accessing a page using the <b>file://</b> schema.</h2><span> In order to to use this you need to grant Adjust permission to use local files. Open <b>chrome://extensions</b>, find the Adjust extension and check the <b>'Allow access to file URLs'</b> box.</span>");
             }else{
-                window.$( '#warning' ).hide();
+                w.$( '#warning' ).hide();
             }
 
             container = doc.querySelector( '#container' );
@@ -230,11 +235,22 @@ require([
                             clean();
                         });
 
+                        port.listen( "CONSTRAIN", function( evt ){
+                            if( controllers && controllers[evt.message.from] ){
+                                var controlier = controllers[evt.message.from][evt.message.name ];
+                                if( controlier ) controlier.constraint = evt.message.constraint;
+                            }else if( control_model ){
+                                control_model[evt.message.from].constraints[evt.message.name ] = evt.message.constraint;
+                            }
+                        });
+
                         port.listen( 'UPDATED', function( evt ){
 
                             if( controllers && controllers[evt.message.from] ){
                                 var controlier = controllers[evt.message.from][evt.message.change.name ];
                                 if( controlier ) controlier.value = evt.message.change.value;
+                            }else if ( control_model ){
+                                control_model[evt.message.from].definition[evt.message.change.name ] = evt.message.change.value;
                             }
                             // log( 'UPDATED FROM: ' + evt.message.from + ". Change is, " + evt.message.change.name + " = " + evt.message.change.value );
 

@@ -24,6 +24,8 @@ html, body{
     float:right;
 }
 
+
+
 .main{
     padding: 1em;
     -webkit-column-width: 21em;
@@ -54,4 +56,10 @@ html, body{
 
 input[type="range"]{
     display: inline;
+}
+
+
+.vec3{
+    width:100%;
+    height: calc( width * 1 );
 }

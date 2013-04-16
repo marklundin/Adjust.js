@@ -19,15 +19,12 @@ require(['adjust'],function( adjust ){
 
         //Adjust
 
-        var apiJUI = new adjust( 'YourClass Adjustment', apiClassInstance ),
-            ajui = new adjust( {
-                bool: true,
-                float: 1.0,
-                int: 0,
-                fn: function(){console.log( 'CALLED' )},
-                str: 'A string',
-            });
-
+        var apiJUI = new adjust( 'YourClass Adjustment', apiClassInstance );
+        document.onclick = function(){
+            // apiClassInstance.someNumber += 20;
+            // console.log( apiClassInstance.someNumber );
+            apiJUI.constrain( 'someInteger', {min:10, max:300, step: 10 } );
+        }
 
         var i = 0;
         function loop(){

@@ -3,7 +3,7 @@ define(function(){
     return {
 
 
-        Slider : function( name, value ){
+        Slider : function( name, value, constraints ){
 
             var domElement = document.createElement( 'div' ),
                 input = document.createElement('input'),
@@ -35,17 +35,25 @@ define(function(){
                     label.innerText = v;
                 },
 
+                set constraint ( v ){
+                    v = v || {};
+                    input.max = v.max || 100;
+                    input.min = v.min || 0;
+                    input.step = v.step || 0.1;
+                },
+
                 get value (){
                     return Number( input.value );
                 }
             }
 
-            api.value = value;
+            api.value       = value;
+            api.constraint = constraints;
 
             return api;
         },
 
-        Button : function( name, value ){
+        Button : function( name, value, constraints ){
 
             var domElement = document.createElement( 'div' ),
                 label = document.createElement( 'span' ),
@@ -71,7 +79,7 @@ define(function(){
             return api;
         },
 
-        TextInput : function( name, value ){
+        TextInput : function( name, value, constraints ){
 
             var domElement = document.createElement( 'div' ),
                 label = document.createElement( 'label' ),
@@ -107,18 +115,22 @@ define(function(){
                     input.value = v;
                 },
 
+                set constraint ( v ){
+                },
+
                 get value (){
                     return input.value;
                 }
             }
 
             api.value = value;
+            api.constraint = constraints;
 
             return api;
         },
 
 
-        Color : function( name, value, window ){
+        Color : function( name, value, constraints, window ){
 
             var domElement = document.createElement( 'div' ),
                 picker = document.createElement( 'div' ),
@@ -155,6 +167,9 @@ define(function(){
 
                 },
 
+                set constraint ( v ){
+                },
+
                 get value (){
                     var hex = parseInt( input.innerText.split('#')[1], 16 );
                     pValue.r = hex >> 16;
@@ -164,13 +179,14 @@ define(function(){
                 }
             }
 
-            api.value = value
+            api.value = value;
+            api.constraint = constraints;
 
             return api;
         },
 
 
-        CheckBox : function( name, value ){
+        CheckBox : function( name, value, constraints ){
 
             var domElement = document.createElement( 'div' ),
                 input = document.createElement( 'input' ),
@@ -195,14 +211,100 @@ define(function(){
                     input.checked = v;
                 },
 
+                set constraint ( v ){
+                },
+
                 get value (){
                     return input.checked;
                 }
             }
 
             api.value = value;
+            api.constraint = constraints;
 
             return api;
+        },
+
+        Vector3: function( name, value, constraints, w ){
+
+
+            "use strict";
+
+
+
+            var camera      = new THREE.OrthographicCamera( -1, 1, -1, 1 ),
+                scene       = new THREE.Scene(),
+                domElement  = document.createElement( 'div' ),
+                renderer    = new THREE.WebGLRenderer(),
+                init        = false;
+
+            // Constants
+            var pixelRatio      = window.devicePixelRatio || 1,
+                SCREEN_WIDTH    = domElement.clientWidth * pixelRatio,
+                SCREEN_HEIGHT   = domElement.clientHeight * pixelRatio;
+
+            domElement.appendChild( renderer.domElement );
+            domElement.className = 'vec3';
+            domElement.id = name;
+
+
+            // Position camera
+            camera.position.z = 1;
+            // camera.position.y = 350;
+            camera.lookAt( scene.position );
+
+
+            // Add test Cube
+            var sphere = new THREE.Mesh( new THREE.SphereGeometry( 1, 100, 100), new THREE.MeshNormalMaterial() );
+            // scene.add( sphere );
+            var axis = new THREE.AxisHelper();
+            scene.add( axis );
+
+
+            //Event Listeners
+            function onWindowResize( event ) {
+
+                if( !init ) init = true;
+
+                domElement.style.height = domElement.clientWidth+"px";
+                // console.log( domElement.outerWidth, domElement.width, domElement.innerWidth );
+
+                var pixelRatio  = w.devicePixelRatio || 1;
+                SCREEN_WIDTH    = domElement.clientWidth * pixelRatio;
+                SCREEN_HEIGHT   = domElement.clientHeight * pixelRatio;
+
+                renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+
+                camera.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
+                camera.updateProjectionMatrix();
+
+            }
+
+            function render()
+            {
+                if( domElement.parentNode && !init ) onWindowResize();
+                axis.rotation.x += 0.1;
+                renderer.render( scene, camera );
+                requestAnimationFrame( render );
+            }
+
+            //Add Listeners
+            w.addEventListener( 'resize', onWindowResize );
+
+            //Begin Render
+
+            // w.$(w.document).ready(function(){
+                // onWindowResize();
+                render();
+            // });
+
+
+            var api = {
+                domElement: domElement
+            }
+
+            return api;
+
         }
 
     }

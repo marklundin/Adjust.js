@@ -10,6 +10,15 @@
       this.message  = message || {};
     }
 
+    function extend( obj, sub ){
+        for( var prop in sub ){
+            if( sub.hasOwnProperty( prop )){
+                obj[prop] = sub[prop];
+            }
+        }
+        return obj;
+    }
+
     window.addEventListener( "message", function( e ) {
 
         if( e.data.type === "REQUEST_OBJECT_DEF" ){
@@ -21,7 +30,8 @@
                 manifest.push( {
                     name: all[i].name,
                     id: i,
-                    definition: makesafe( all[i].api )
+                    definition: makesafe( all[i].api ),
+                    constraints: makesafe( all[i].params )
                 });
                 i++;
             }
@@ -44,20 +54,31 @@
     var Adjust = function( apiObjOrString, apiObj ){
 
         var nameDefined = typeof apiObjOrString === 'string';
-        this.name = nameDefined ? apiObjOrString : "ADJS " + ( all.length + 1 );
-        this.api = nameDefined ? apiObj : apiObjOrString;
+        this.name       = nameDefined ? apiObjOrString : "ADJS " + ( all.length + 1 );
+        this.api        = nameDefined ? apiObj : apiObjOrString;
+        this.params     = {};
 
         this.changeHandler = changeHandler.bind( this );
-        all.push( this );
         Object.observe( this.api, this.changeHandler );
 
-        this.remove = function(){
-
-            window.postMessage( new Event( "REMOVE", {from:all.indexOf( this ) } ), "*" );
-            all.splice( all.indexOf( this ), 1 );
-
-        }
+        all.push( this );
         init( this );
+    }
+
+    Adjust.prototype.constrain = function( reference, constraints ){
+
+        this.params[reference] = this.params[reference] ? extend( this.params[reference], constraints ) : this.params[reference] = constraints;
+        var evt = new Event( "CONSTRAIN", {constraint:this.params[reference], name:reference, from:all.indexOf( this )} );
+        console.log(this.params[reference]);
+        window.postMessage( evt, "*" );
+
+    }
+
+    Adjust.prototype.remove = function(){
+
+        window.postMessage( new Event( "REMOVE", {from:all.indexOf( this ) } ), "*" );
+        all.splice( all.indexOf( this ), 1 );
+
     }
 
 

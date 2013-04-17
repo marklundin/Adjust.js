@@ -135,8 +135,8 @@ require([
                 container.appendChild( subCont );
 
                 // TODO : Remove
-                var vec = new control.Vector3( 'Vec3', {x:23, y:23, z:23 }, {}, wind );
-                subCont.appendChild( vec.domElement );
+                // var vec = new control.Vector3( 'Vec3', {x:23, y:23, z:23 }, {}, wind );
+                // subCont.appendChild( vec.domElement );
 
                 var instControllers = [];
 

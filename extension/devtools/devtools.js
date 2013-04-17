@@ -143,11 +143,6 @@ require([
                 subCont.appendChild( controllerCont );
                 container.appendChild( subCont );
 
-                // TODO : Remove
-                // var vec = new control.Vector3( 'Vec3', {x:23, y:23, z:23 }, {}, wind );
-                // controllerCont.appendChild( vec.domElement );
-                // vec.domElement.className = 'controller';
-
                 wind.$( foldButton ).click(function(){
                     wind.$( controllerCont ).toggle();
                 })

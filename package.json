@@ -1,0 +1,20 @@
+{
+  "name": "Adjust.js",
+  "version": "0.0.0",
+  "description": "A javascript controller for Chrome developer tools",
+
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/marklundin/ad.js.git"
+  },
+  "keywords": [
+    "Chrome",
+    "extension",
+    "javascript",
+    "GUI"
+  ],
+  "author": "Mark Lundin",
+  "license": "MIT",
+  "readmeFilename": "README.md",
+  "gitHead": "c1aca9751d8d170c3b6c547fac01985da81b9309"
+}

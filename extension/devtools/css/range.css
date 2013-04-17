@@ -8,6 +8,7 @@ input[type="range"]{
     border-radius: 3px;
     margin-top: 10px;
     padding-right: 3px;
+    padding-left: 3px;
 
     background-image: -webkit-gradient(
         linear,

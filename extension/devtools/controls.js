@@ -227,15 +227,14 @@ define(function(){
 
         Vector3: function( name, value, constraints, w ){
 
-
             "use strict";
-
-
 
             var camera      = new THREE.OrthographicCamera( -1, 1, -1, 1 ),
                 scene       = new THREE.Scene(),
                 domElement  = document.createElement( 'div' ),
                 renderer    = new THREE.WebGLRenderer(),
+                controls    = new TrackballControls( camera, domElement ),
+                object      = new THREE.Object3D(),
                 init        = false;
 
             // Constants
@@ -248,17 +247,28 @@ define(function(){
             domElement.id = name;
 
 
+
+
             // Position camera
-            camera.position.z = 1;
+            camera.position.z = -1;
             // camera.position.y = 350;
             camera.lookAt( scene.position );
 
 
             // Add test Cube
             var sphere = new THREE.Mesh( new THREE.SphereGeometry( 1, 100, 100), new THREE.MeshNormalMaterial() );
-            // scene.add( sphere );
+            // var sphere = new THREE.Mesh( new THREE.CubeGeometry( 1, 1, 1 ), new THREE.MeshNormalMaterial() );
             var axis = new THREE.AxisHelper();
-            scene.add( axis );
+
+
+            controls.noZoom = false;
+            controls.noPan = false;
+            controls.staticMoving = true;
+            controls.addEventListener( 'change', render );
+
+            scene.add( object );
+            object.add( sphere );
+            object.add( axis );
 
 
             //Event Listeners
@@ -266,12 +276,14 @@ define(function(){
 
                 if( !init ) init = true;
 
-                domElement.style.height = domElement.clientWidth+"px";
-                // console.log( domElement.outerWidth, domElement.width, domElement.innerWidth );
+
+                domElement.style.height = ( domElement.clientWidth + 20 ) +"px";
+
+                console.log( domElement.outerWidth, domElement.width, domElement.innerWidth, domElement.clientWidth );
 
                 var pixelRatio  = w.devicePixelRatio || 1;
                 SCREEN_WIDTH    = domElement.clientWidth * pixelRatio;
-                SCREEN_HEIGHT   = domElement.clientHeight * pixelRatio;
+                SCREEN_HEIGHT   = domElement.clientWidth * pixelRatio;
 
                 renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 
@@ -280,21 +292,34 @@ define(function(){
 
             }
 
+            function animate() {
+
+                if( domElement.parentNode && !init ) onWindowResize();
+                controls.handleResize();
+                requestAnimationFrame( animate );
+                controls.update();
+
+            }
+
             function render()
             {
-                if( domElement.parentNode && !init ) onWindowResize();
-                axis.rotation.x += 0.1;
+
+                // axis.rotation.x += 0.1;
+
                 renderer.render( scene, camera );
-                requestAnimationFrame( render );
+                // requestAnimationFrame( render );
             }
 
             //Add Listeners
             w.addEventListener( 'resize', onWindowResize );
 
+
+
             //Begin Render
 
             // w.$(w.document).ready(function(){
                 // onWindowResize();
+                animate();
                 render();
             // });
 

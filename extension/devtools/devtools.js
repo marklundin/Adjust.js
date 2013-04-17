@@ -4,7 +4,8 @@
 require([
     'port',
     'controls',
-    'js/build/three.min'
+    'js/build/three.min',
+    'js/extras/controls/TrackballControls'
     ],function(
         connect,
         control
@@ -123,20 +124,33 @@ require([
                 name = model[i].name;
                 //log( name );
 
-                subCont = doc.createElement( 'div' );
-                heading = doc.createElement( 'h3' );
+                subCont        = doc.createElement( 'div' );
+                heading        = doc.createElement( 'h3' );
+                foldButton     = doc.createElement( 'div' );
+                controllerCont = doc.createElement( 'div' );
+
 
                 subCont.id = name;
                 subCont.className = 'adjs-instance';
+                foldButton.className = "fold-button floatRight";
+                heading.className = "heading";
+                controllerCont.className = "controller-cont";
 
                 heading.innerHTML = name;
 
                 subCont.appendChild( heading );
+                subCont.appendChild( foldButton );
+                subCont.appendChild( controllerCont );
                 container.appendChild( subCont );
 
                 // TODO : Remove
                 var vec = new control.Vector3( 'Vec3', {x:23, y:23, z:23 }, {}, wind );
-                subCont.appendChild( vec.domElement );
+                controllerCont.appendChild( vec.domElement );
+                vec.domElement.className = 'controller';
+
+                wind.$( foldButton ).click(function(){
+                    wind.$( controllerCont ).toggle();
+                })
 
                 var instControllers = [];
 
@@ -155,7 +169,7 @@ require([
                         }.bind( this, controllier, instControllers, prop );
 
 
-                        subCont.appendChild( controllier.domElement );
+                        controllerCont.appendChild( controllier.domElement );
 
                     }
                 }
@@ -292,7 +306,7 @@ require([
                                     //subCont.appendChild( controllier.domElement );
 
                                     // TODO :: what if panel isnt show yet
-                                    container.childNodes[obj.from].appendChild( controllier.domElement );
+                                    container.childNodes[obj.from].childNodes[1].appendChild( controllier.domElement );
 
                                 }
                             }else{

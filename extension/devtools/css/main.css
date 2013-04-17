@@ -15,15 +15,18 @@ html, body{
     padding: 0px;
 }
 
+.floatRight{
+    float: right;
+}
+
 #warning{
     padding: 20%;
     padding-top: 10%;
 }
 
-.floatRight{
-    float:right;
+.heading{
+    display: inline-block;
 }
-
 
 
 .main{
@@ -51,6 +54,7 @@ html, body{
     display: inline-block;
     padding: 1em;
     padding-top: 0.5em;
+    padding-bottom: 0.5em;
     width: 100%;
 }
 
@@ -58,8 +62,30 @@ input[type="range"]{
     display: inline;
 }
 
+.controller-cont{
+
+    padding-bottom: 0.5em;
+
+}
+
 
 .vec3{
     width:100%;
     height: calc( width * 1 );
+}
+
+
+.fold-button{
+    background: no-repeat url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAQAAADZc7J/AAAAAmJLR0QA/4ePzL8AAAAJcEhZcwAACxIAAAsSAdLdfvwAAAAJdnBBZwAAACAAAAAgAIf6nJ0AAABESURBVEjHY/zPQBlgolD/qAGjBjAwMDAwsCBz9hCZLF0YB5MXGJFdzUikJmQ91A3E3cTm7dFARAHDLRAHxAWjBgwLAwBdvAu1JR0scQAAAABJRU5ErkJggg==);
+    display: inline-block;
+    height: 32px;
+    width: 32px;
+    margin-top: 0.4em;
+    opacity: 0.5;
+}
+
+.fold-button:hover{
+
+    opacity: 0.9;
+
 }

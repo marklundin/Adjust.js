@@ -2,7 +2,7 @@
  * @author Eberhard Graether / http://egraether.com/
  */
 
-THREE.TrackballControls = function ( object, domElement ) {
+TrackballControls = function ( object, domElement ) {
 
 	THREE.EventDispatcher.call( this );
 
@@ -73,11 +73,11 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 	this.handleResize = function () {
 
-		this.screen.width = window.innerWidth;
-		this.screen.height = window.innerHeight;
+		this.screen.width = domElement.clientWidth;
+		this.screen.height = domElement.clientHeight;
 
-		this.screen.offsetLeft = 0;
-		this.screen.offsetTop = 0;
+		this.screen.offsetLeft = domElement.offsetLeft;
+		this.screen.offsetTop = domElement.offsetTop;
 
 		this.radius = ( this.screen.width + this.screen.height ) / 4;
 
@@ -109,6 +109,8 @@ THREE.TrackballControls = function ( object, domElement ) {
 			( _this.screen.height * 0.5 + _this.screen.offsetTop - clientY ) / _this.radius,
 			0.0
 		);
+        mouseOnBall.x *= -1;
+        // console.log( mouseOnBall.x, mouseOnBall.x*-1 );
 
 		var length = mouseOnBall.length();
 
@@ -135,7 +137,7 @@ THREE.TrackballControls = function ( object, domElement ) {
 	this.rotateCamera = function () {
 
 		var angle = Math.acos( _rotateStart.dot( _rotateEnd ) / _rotateStart.length() / _rotateEnd.length() );
-
+        // console.log( _rotateEnd, _rotateStart );
 		if ( angle ) {
 
 			var axis = ( new THREE.Vector3() ).crossVectors( _rotateStart, _rotateEnd ).normalize(),
@@ -269,6 +271,7 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 		_this.object.position.addVectors( _this.target, _eye );
 
+
 		_this.checkDistances();
 
 		_this.object.lookAt( _this.target );
@@ -344,6 +347,7 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 	function mousedown( event ) {
 
+
 		if ( _this.enabled === false ) return;
 
 		event.preventDefault();
@@ -369,8 +373,8 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 		}
 
-		document.addEventListener( 'mousemove', mousemove, false );
-		document.addEventListener( 'mouseup', mouseup, false );
+		domElement.addEventListener( 'mousemove', mousemove, false );
+		domElement.addEventListener( 'mouseup', mouseup, false );
 
 	}
 
@@ -380,7 +384,6 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 		event.preventDefault();
 		event.stopPropagation();
-
 		if ( _state === STATE.ROTATE && !_this.noRotate ) {
 
 			_rotateEnd = _this.getMouseProjectionOnBall( event.clientX, event.clientY );
@@ -406,8 +409,8 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 		_state = STATE.NONE;
 
-		document.removeEventListener( 'mousemove', mousemove );
-		document.removeEventListener( 'mouseup', mouseup );
+		domElement.removeEventListener( 'mousemove', mousemove );
+		domElement.removeEventListener( 'mouseup', mouseup );
 
 	}
 

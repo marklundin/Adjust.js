@@ -14,16 +14,10 @@ require(['adjust'],function( adjust ){
             this.someString = "Hey I'm a string";
         }
 
-        var apiClassInstance = new YourClass();
-
-
-        //Adjust
-
-        var apiJUI = new adjust( 'YourClass Adjustment', apiClassInstance );
+        //Adjust it
+        var controller = new adjust( 'YourClass Adjustment', new YourClass() );
         document.onclick = function(){
-            // apiClassInstance.someNumber += 20;
-            // console.log( apiClassInstance.someNumber );
-            apiJUI.constrain( 'someInteger', {min:10, max:300, step: 10 } );
+            controller.constrain( 'someInteger', {min:10, max:300, step: 10 } );
         }
 
         var i = 0;

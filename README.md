@@ -1,4 +1,4 @@
-Ad.js
+Adjust.js
 =====
 
-A chrome dev tool extension providing a graphical user interface over javascript types
+A javascript controller interface for chrome developer tools

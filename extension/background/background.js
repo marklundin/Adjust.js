@@ -110,44 +110,12 @@ require([ 'underscore' ], function( ){
                     });
                 });
 
-                // var onContentConnected = function( devport, contentport ){
-
-
-                //     if( contentport.name !== 'content' ) return;
-
-
-
-                //     devport.postMessage({type:"CONNECTED"});
-
-                //     chrome.runtime.onConnect.removeListener( onContentConnected );
-
-                // }.bind( this, port );
-
-                // chrome.runtime.onConnect.addListener( onContentConnected );
 
             }
 
         });
 
 
-        // switchboard( 'JUI', function(){
-
-        //     //TODO : Determine if this tab is actually of 'file://' schema,
-        //     //if so, check whether isAllowedFileSchemeAccess and prompt user if error
-
-        //     // chrome.tabs.getSelected(null, function(tab) {
-        //     //     var tabId = tab.id;
-        //     //     tabUrl = tab.url;
-
-        //
-        //     if( !injected ){
-        //         injected = true;
-        //         // chrome.tabs.executeScript( null, {file:'/require.js'})
-
-        //     }
-
-
-        // });
 
 
 });

@@ -2,6 +2,7 @@
   "name": "Adjust.js",
   "version": "0.0.0",
   "description": "A javascript controller for Chrome developer tools",
+  "private": true,
 
   "repository": {
     "type": "git",

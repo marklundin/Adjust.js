@@ -19,6 +19,33 @@
         return obj;
     }
 
+
+    var colorSignatures = [
+        {
+            r:0,
+            g:0,
+            b:0
+        }
+    ]
+
+    function definesSignature( obj, signatures ){
+
+            var i = signatures.length,
+                signature;
+
+            while( i-- > 0 ){
+                signature = signatures[i];
+                for( var prop in signature ){
+                    if( signature.hasOwnProperty( prop ) && obj.hasOwnProperty( prop ) ){
+                        if( typeof obj[prop] !== typeof signature[prop]) return false;
+                    }else{
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
     window.addEventListener( "message", function( e ) {
 
         if( e.data.type === "REQUEST_OBJECT_DEF" ){
@@ -48,7 +75,18 @@
 
 
             Object.unobserve( all[change.from].api, all[change.from].changeHandler );
-            all[change.from].api[change.prop] = change.value;
+
+            if( definesSignature( all[change.from].api[change.prop], colorSignatures ))
+            {
+                console.log( 'yes' );
+                all[change.from].api[change.prop].r = change.value.r;
+                all[change.from].api[change.prop].g = change.value.g;
+                all[change.from].api[change.prop].b = change.value.b;
+            }else{
+                all[change.from].api[change.prop] = change.value;
+            }
+
+
             Object.observe( all[change.from].api, all[change.from].changeHandler );
 
             for( var listener in all[change.from].listeners ){
@@ -81,7 +119,6 @@
 
         this.params[reference] = this.params[reference] ? extend( this.params[reference], constraints ) : this.params[reference] = constraints;
         var evt = new Event( "CONSTRAIN", {constraint:this.params[reference], name:reference, from:all.indexOf( this )} );
-        console.log(this.params[reference]);
         window.postMessage( evt, "*" );
 
     }

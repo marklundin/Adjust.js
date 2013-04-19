@@ -23,7 +23,7 @@ require([ 'underscore' ], function( ){
 
         chrome.runtime.onConnect.addListener( function( devport ) {
 
-
+            console.log( devport.name );
             if( devport.name.indexOf( 'dev_tool_' ) === 0 ){
 
                 chrome.tabs.get( Number( devport.name.split( 'dev_tool_')[1] )|0, function( aTab ) {
@@ -31,6 +31,8 @@ require([ 'underscore' ], function( ){
                     var tab = aTab,
                         tabUrl = tab.url,
                         contentport;
+
+                    if( tabUrl.indexOf( "chrome-devtools://") !== -1 ) return;
 
                     injectScripts( tab, function(){
 

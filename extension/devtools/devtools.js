@@ -48,6 +48,8 @@ require([
             }
         ]
         function getController( name, value, constraints ){
+
+            console.log( name, value, definesSignature( value, colorSignatures ));
             return ( value === '-*ad.js function*-' ) ? new control.Button( name, value , constraints) :
                    ( definesSignature( value, colorSignatures ) ) ? new control.Color( name, value, constraints, wind )  :
                    ( typeof value === 'string' )    ? new control.TextInput( name, value, constraints ) :
@@ -152,7 +154,7 @@ require([
                 def = model[i].definition;
                 for( var prop in def ){
 
-                    var controllier = getController( prop, def[prop], model[i].constraints[prop] );
+                    var controllier = getController( prop, def[prop], model[i].constraints ? model[i].constraints[prop] : {} );
                     if( controllier ){
                         controllier.domElement.id = prop;
                         controllier.domElement.className = 'controller';
@@ -216,7 +218,10 @@ require([
                 //             //return;
                 //         }
 
-                        //
+
+                        var tID = chrome.devtools.inspectedWindow.tabId;
+                        if( isNaN( tID )) return;
+
                         port = connect( 'dev_tool_'+chrome.devtools.inspectedWindow.tabId  );
 
                         port.listen( ["CONNECTED", "PAGE_CHANGED"], function( evt ){

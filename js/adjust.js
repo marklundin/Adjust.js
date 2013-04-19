@@ -43,11 +43,18 @@
             var change = e.data.message;
             if( typeof all[change.from].api[change.prop] === 'function' ){
                 all[change.from].api[change.prop].call( null );
+                return;
             }
+
 
             Object.unobserve( all[change.from].api, all[change.from].changeHandler );
             all[change.from].api[change.prop] = change.value;
             Object.observe( all[change.from].api, all[change.from].changeHandler );
+
+            for( var listener in all[change.from].listeners ){
+                all[change.from].listeners[listener]( { property: change.prop, value: change.value });
+            }
+
         }
     });
 
@@ -57,12 +64,17 @@
         this.name       = nameDefined ? apiObjOrString : "ADJS " + ( all.length + 1 );
         this.api        = nameDefined ? apiObj : apiObjOrString;
         this.params     = {};
+        this.listeners  = [];
 
         this.changeHandler = changeHandler.bind( this );
         Object.observe( this.api, this.changeHandler );
 
         all.push( this );
         init( this );
+    }
+
+    Adjust.prototype.onchange = function( fn ){
+        this.listeners.push( fn );
     }
 
     Adjust.prototype.constrain = function( reference, constraints ){

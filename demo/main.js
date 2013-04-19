@@ -20,6 +20,10 @@ require(['adjust'],function( adjust ){
             controller.constrain( 'someInteger', {min:10, max:300, step: 10 } );
         }
 
+        controller.onchange(function( change ){
+            console.log( change );
+        })
+
         var i = 0;
         function loop(){
 
